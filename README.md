@@ -1,12 +1,12 @@
 <div align="center">
-    <h1>libgarak</h1>
+    <h1>garak</h1>
 </div>
 
 [![Unittests](https://github.com/mattcoding4days/garak/actions/workflows/cmake.yml/badge.svg)](https://github.com/mattcoding4days/garak/actions/workflows/cmake.yml)
 
 ## :information_source: About 
 
-> A lightweight async tcp framework written in C++20 using boost asio
+> A lightweight templated async tcp framework written in C++20 using boost asio
 
 ## :building_construction: Development
 

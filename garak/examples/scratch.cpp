@@ -1,3 +1,4 @@
+#include <garak/bundled/asio/asio.hpp>
 #include <garak/version.hpp>
 #include <iostream>
 

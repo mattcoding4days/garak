@@ -37,7 +37,12 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR OR CMAKE_CURRENT_B
 endif()
 
 #
-# NOTE: This is where 3rd party libraries should be installed via the light weight CPM dependancy
+# NOTE: Add the threads library
+#
+find_package(Threads REQUIRED)
+
+#
+# NOTE: This is where 3rd party libraries should be installed via the light weight CPM dependency
 # management system. The CPM wiki is here: https://github.com/cpm-cmake/CPM.cmake/wiki/More-Snippets
 #
 # NOTE: googletest version >= 3.11.0 now has google mock, and google benchmark libraries built into it,
@@ -75,6 +80,16 @@ if(GARAK_BUILD_TESTING)
   message(STATUS "${PACKAGE_NAME} -- Tests Enabled")
   add_subdirectory("tests")
 endif()
+
+#
+# NOTE: Add the bundled boost asio version 1.24.0 stand alone as an interface library
+# https://github.com/chriskohlhoff/asio
+#
+add_library(asio INTERFACE)
+target_include_directories(asio INTERFACE "${GARAK_INCLUDE_DIR}/garak/bundled/asio")
+target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
+target_link_libraries(asio INTERFACE Threads::Threads)
+message(STATUS "Adding bundled asio standalone")
 
 #
 # NOTE: Add the src directory to complete building the shared library
