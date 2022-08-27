@@ -2,9 +2,7 @@
     <h1>libgarak</h1>
 </div>
 
-<br>
-<div align="center">
-</div>
+[![Unittests](https://github.com/mattcoding4days/garak/actions/workflows/cmake.yml/badge.svg)](https://github.com/mattcoding4days/garak/actions/workflows/cmake.yml)
 
 ## :information_source: About 
 
