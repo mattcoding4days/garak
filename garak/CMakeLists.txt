@@ -16,9 +16,9 @@ set(PACKAGE_VERSION ${${PACKAGE_NAME}_VERSION})
 # NOTE: Set our source and include directory variables for use through the build
 #
 set(GARAK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(GARAK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(GARAK_TEST_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 set(GARAK_EXAMPLES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/examples")
-set(GARAK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 #
 # NOTE: add additional project options
