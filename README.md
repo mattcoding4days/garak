@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>libgarak</h1>>
+    <h1>libgarak</h1>
 </div>
 
 <br>
