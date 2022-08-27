@@ -5,7 +5,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND noninteractive
 
 # Upgrade the system
-# RUN apt-get update && apt-get upgrade -y --allow-downgrades
+RUN apt-get update && apt-get upgrade -y --allow-downgrades
 
 # install basics
 RUN apt-get -y install lsb-release wget software-properties-common
@@ -20,10 +20,9 @@ RUN apt-get -y install clang clang-format clang-tidy cmake-format
 RUN pip install  distro
 
 # Copy the files to the image
-COPY ../cmake /starter/cmake
-COPY ../core /starter/core
-COPY ../app /starter/app
-COPY ../CMakeLists.txt /starter/CMakeLists.txt
+COPY ../cmake /libgarak/cmake
+COPY ../garak /libgarak/garak
+COPY ../CMakeLists.txt /libgarak/CMakeLists.txt
 
 # copy clang config files
 COPY ../.clang-format /starter
@@ -34,7 +33,7 @@ COPY ../.cmake-format.yaml /starter
 COPY ../devkit /starter/devkit
 COPY ../tooling /starter/tooling
 
-WORKDIR /starter
+WORKDIR /libgarak
 
 # format the project
 RUN ./devkit clang --format
@@ -47,7 +46,5 @@ RUN ./devkit clang --lint
 
 # Run tests. If you did not build a project,
 # make sure to comment out the tests for that project
-RUN cd build/core && ctest -VV
-RUN ./build/core/examples/starter_core_example_one.bin
-RUN cd build/app && ctest -VV
-RUN ./build/app/src/starter_app.bin
+RUN cd build/garak && ctest -VV
+RUN ./build/garak/examples/.bin

@@ -1,4 +1,4 @@
-set(PACKAGE_NAME "starter_app")
+set(PACKAGE_NAME "garak")
 
 #
 # NOTE: `get_version()` defines the variable `${${PACKAGE_NAME}_VERSION}` which is used below to set
@@ -6,31 +6,33 @@ set(PACKAGE_NAME "starter_app")
 #
 get_version()
 
-# Rename `${${PACKAGE_NAME}_VERSION}` variable to `${PACKAGE_VERSION}` for easy reference in the
+#
+# NOTE: Rename `${${PACKAGE_NAME}_VERSION}` variable to `${PACKAGE_VERSION}` for easy reference in the
 # current `CMakeLists.txt` file.
+#
 set(PACKAGE_VERSION ${${PACKAGE_NAME}_VERSION})
 
 #
 # NOTE: Set our source and include directory variables for use through the build
 #
-set(APP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(APP_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(APP_TEST_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-set(APP_EXAMPLES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+set(GARAK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(GARAK_TEST_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+set(GARAK_EXAMPLES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+set(GARAK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 #
 # NOTE: add additional project options
 #
-option(STARTER_BUILD_APP_TESTING "Enable Test builds" ON)
-option(STARTER_BUILD_APP_EXAMPLES "Enable Test builds" ON)
+option(GARAK_BUILD_TESTING "Enable Test builds" ON)
+option(GARAK_BUILD_EXAMPLES "Enable example builds" ON)
 
 #
 # NOTE: Prevent in source builds (can't build in src/ or in project root)
 #
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR OR CMAKE_CURRENT_BINARY_DIR STREQUAL APP_SOURCE_DIR)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR OR CMAKE_CURRENT_BINARY_DIR STREQUAL GARAK_SOURCE_DIR)
   message(
     FATAL_ERROR
-    "In source builds are not allowed. Please make a new directory (called a build directory) and run CMake from there."
+      "In source builds are not allowed. Please make a new directory (called a build directory) and run CMake from there."
   )
 endif()
 
@@ -43,7 +45,7 @@ endif()
 #
 # NOTE: Using `CPMFindPackage()` to install package only if it is not already installed.
 #
-if(STARTER_BUILD_APP_TESTING)
+if(GARAK_BUILD_TESTING)
   cpmaddpackage(
     NAME
     googletest
@@ -75,14 +77,14 @@ if(STARTER_BUILD_APP_TESTING)
 endif()
 
 #
+# NOTE: Add the src directory to complete building the shared library
+#
+add_subdirectory("src")
+
+#
 # NOTE: Build project examples
 #
-if(STARTER_BUILD_APP_EXAMPLES)
+if(GARAK_BUILD_EXAMPLES)
   message(STATUS "${PACKAGE_NAME} -- Examples Enabled")
   add_subdirectory("examples")
 endif()
-
-#
-# NOTE: Add the src/ subdirectory to finish building the executable
-#
-add_subdirectory("src")

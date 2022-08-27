@@ -1,6 +1,6 @@
-#include <starter_app/version.hpp>
+#include <garak/version.hpp>
 
-namespace starter::app {
+namespace garak {
 std::string get_version() {
   return std::string{std::to_string(VMAJOR)}
       .append(".")
@@ -8,4 +8,4 @@ std::string get_version() {
       .append(".")
       .append(std::to_string(VPATCH));
 }
-}  // namespace starter::app
+}  // namespace garak

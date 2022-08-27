@@ -15,8 +15,7 @@ PROJECT_BUILD_DIR = PROJECT_ROOT / "build"
 
 # All c++ projects must be added to this list
 PROJECTS: List[Path] = [
-    PROJECT_ROOT / "app",
-    PROJECT_ROOT / "core"
+    PROJECT_ROOT / "garak"
 ]
 
 # Package configurations, used for building a debian, slackware, or rpm package,

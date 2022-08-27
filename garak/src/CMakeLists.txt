@@ -9,11 +9,11 @@ message(STATUS "Building ${PACKAGE_NAME}_v${PACKAGE_VERSION} [${CMAKE_BUILD_TYPE
 add_library(
   ${PACKAGE_NAME} SHARED
   # Add Header files
-  "${CORE_INCLUDE_DIR}/${PACKAGE_NAME}/version.hpp"
+  "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/version.hpp"
   # Add Source files
-  "${CORE_SOURCE_DIR}/version.cpp")
+  "${GARAK_SOURCE_DIR}/version.cpp")
 
-target_include_directories(${PACKAGE_NAME} PUBLIC ${CORE_INCLUDE_DIR})
+target_include_directories(${PACKAGE_NAME} PUBLIC ${GARAK_INCLUDE_DIR})
 target_link_libraries(${PACKAGE_NAME} PRIVATE project_options project_warnings stdc++fs)
 
 #
@@ -22,5 +22,5 @@ target_link_libraries(${PACKAGE_NAME} PRIVATE project_options project_warnings s
 # and the shared object files to be installed to /usr/lib/
 #
 install(TARGETS ${PACKAGE_NAME} LIBRARY DESTINATION lib)
-install(DIRECTORY "${CORE_INCLUDE_DIR}/" DESTINATION include)
+install(DIRECTORY "${GARAK_INCLUDE_DIR}/" DESTINATION include)
 set_target_properties(${PACKAGE_NAME} PROPERTIES VERSION ${${PACKAGE_NAME}_VERSION} SOVERSION ${${PACKAGE_NAME}_VMAJOR})
