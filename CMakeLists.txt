@@ -46,14 +46,13 @@ set_project_warnings(project_warnings)
 # NOTE: add additional project options
 #
 option(GARAK_ENABLE_PCH "Enable Precompiled Headers" ON)
-option(GARAK_BUILD "Build the core shared library" ON)
 
 #
 # NOTE: This sets a global PCH parameter, each project will build its own PCH, which is a good idea
 # if any #define's change consider breaking this out per project as necessary. Modify as needed for
 # your project
 #
-if (STARTER_ENABLE_PCH)
+if (GARAK_ENABLE_PCH)
     target_precompile_headers(
             project_options
             INTERFACE
