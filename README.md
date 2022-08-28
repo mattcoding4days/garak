@@ -70,6 +70,9 @@ ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222"
 ## :package: 3rd party packages
 
 1. [gtest](https://github.com/google/googletest)
-  - Googles Unit test framework which also includes a mock library
-  - Why? It compiles way faster than catch2, has a built-in mocking framework, and blends nicely
-    with the Google benchmark library
+   - Googles Unit test framework which also includes a mock library
+   - Why? It compiles way faster than catch2, has a built-in mocking framework, and blends nicely
+     with the Google benchmark library
+
+2. [asio standalone](https://github.com/chriskohlhoff/asio/releases/tag/asio-1-24-0)
+    - Asio standalone header only build 1.24 is bundled into garak
