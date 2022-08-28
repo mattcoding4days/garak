@@ -1,8 +1,8 @@
 function(get_version)
   # Note: The `include` folder containing `version.hpp` for each package should use the same name as
   # the value of `PACKAGE_NAME`, as defined in the package's `CMakeLists.txt`.
-  # ie: `core/include/CortexCore/` should contain `Version.hpp` for the `core` package.
-  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/${PACKAGE_NAME}/version.hpp" file_contents)
+  # ie: `garak/include/garak/utils/` should contain `version.hpp` for the `garak` package.
+  file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/${PACKAGE_NAME}/utils/version.hpp" file_contents)
   string(REGEX MATCH "VMAJOR ([0-9]+)" _ "${file_contents}")
   if(NOT CMAKE_MATCH_COUNT EQUAL 1)
     message(FATAL_ERROR "Could not extract the major version from version.hpp")

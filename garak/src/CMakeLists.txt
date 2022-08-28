@@ -6,12 +6,7 @@ message(STATUS "Building ${PACKAGE_NAME}_v${PACKAGE_VERSION} [${CMAKE_BUILD_TYPE
 #
 # NOTE: Target core as a shared library
 #
-add_library(
-  ${PACKAGE_NAME} SHARED
-  # Add Header files
-  "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/version.hpp"
-  # Add Source files
-  "${GARAK_SOURCE_DIR}/version.cpp")
+add_library(${PACKAGE_NAME} SHARED ${UTILS_MODULE} ${ERROR_MODULE})
 
 target_include_directories(${PACKAGE_NAME} PUBLIC ${GARAK_INCLUDE_DIR})
 target_link_libraries(

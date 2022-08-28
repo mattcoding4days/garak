@@ -1,8 +1,8 @@
-#ifndef GARAK_VERSION_HPP
-#define GARAK_VERSION_HPP
+#ifndef LIBGARAK_UTILS_VERSION_HPP
+#define LIBGARAK_UTILS_VERSION_HPP
 
 /**
- * @file garak/version.hpp
+ * @file garak/utils/version.hpp
  * @author Matt Williams (matt.k.williams@protonmail.com)
  * @brief Adds version support for project, used by Cmake
  * @date 2021-11-19
@@ -14,13 +14,13 @@
 #define VMINOR 1
 #define VPATCH 0
 
-namespace garak {
+namespace garak::utils {
 /**
  * @brief return the version in string format
  *
  * @returns std::string
  * */
 [[maybe_unused]] std::string get_version();
-}  // namespace garak
+}  // namespace garak::utils
 
 #endif

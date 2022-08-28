@@ -1,6 +1,6 @@
-#include <garak/version.hpp>
+#include <garak/utils/version.hpp>
 
-namespace garak {
+namespace garak::utils {
 std::string get_version() {
   return std::string{std::to_string(VMAJOR)}
       .append(".")
