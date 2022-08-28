@@ -50,7 +50,7 @@ CMAKE_PROGRAMS: Dict[str, Dict[str, str]] = {
     },
     "CLANG_ANALYZER": {
         "name": "clang-tidy",
-        "flags": f"-p {PROJECT_BUILD_DIR} --config-file={PROJECT_ROOT / '.clang-tidy'}"
+        "flags": f"-p {PROJECT_BUILD_DIR} -header-filter=.* --config-file={PROJECT_ROOT / '.clang-tidy'}"
     },
     # modify your compiler versions here, flags should not be necessary
     "CLANG_CXX_COMPILER": {

@@ -103,11 +103,18 @@ class Clang:
 
         return self._path_in_directory_ignore(path.parent, project_root, ignore_type)
 
-    def _show_ignored(self) -> None:
+    def _show_stats(self, ignore_type: IgnoreType) -> None:
         """
         @desc print the number of ignored files
         """
+        msg: str = ""
+        if ignore_type == Clang.IgnoreType.ClangFormat:
+            msg += f"Formatted [{len(self._source_files) + len(self._cmake_files)}] file(s)"
+        else:
+            msg += f"Statically Analyzed {len(self._source_files)} file(s)"
+
         print()
+        Log.info(msg)
         Log.warn(f"Ignored: [{len(self._ignored_files)}] file(s)")
 
     def format(self):
@@ -116,7 +123,7 @@ class Clang:
         @raises Exception if name values are None or Empty
         """
         self._aggregate_files(Clang.IgnoreType.ClangFormat)
-        Log.info(f"Formatting all files")
+        Log.info(f"Running clang-format..")
         for file in self._source_files:
             self._shell.execute(f"{self._cxx_formatter} {self._cxx_formatter_flags} {file}")
 
@@ -124,16 +131,16 @@ class Clang:
         for file in self._cmake_files:
             self._shell.execute(f"{self._cmake_formatter} {self._cmake_formatter_flags} {file}")
 
-        self._show_ignored()
+        self._show_stats(Clang.IgnoreType.ClangFormat)
 
     def lint(self):
         """
         @desc Run clang-tidy on all legal files
         """
         self._aggregate_files(Clang.IgnoreType.ClangTidy)
-        Log.info(f"Statically analyzing all files")
+        Log.info(f"Running clang-tidy..")
         files: str = ""
         for file in self._source_files:
             files += f"{file} "
         self._shell.execute(f"{self._linter} {self._linter_flags} {files}")
-        self._show_ignored()
+        self._show_stats(Clang.IgnoreType.ClangTidy)
