@@ -1,6 +1,6 @@
-#include <garak/utils/module.hpp>
-
 #include <gtest/gtest.h>
+
+#include <garak/utils/module.hpp>
 /**
  * @brief Test our library
  * * */

@@ -8,4 +8,4 @@ std::string get_version() {
       .append(".")
       .append(std::to_string(VPATCH));
 }
-}  // namespace garak
+}  // namespace garak::utils
