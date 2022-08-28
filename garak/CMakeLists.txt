@@ -86,7 +86,7 @@ endif()
 # https://github.com/chriskohlhoff/asio
 #
 add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE "${GARAK_INCLUDE_DIR}/garak/bundled/asio")
+target_include_directories(asio INTERFACE "${GARAK_INCLUDE_DIR}")
 target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
 target_link_libraries(asio INTERFACE Threads::Threads)
 message(STATUS "Adding bundled asio standalone")

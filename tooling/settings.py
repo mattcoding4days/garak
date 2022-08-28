@@ -73,19 +73,21 @@ CMAKE_PROGRAMS: Dict[str, Dict[str, str]] = {
 
 # Files that should be ignored for clang-format
 CLANG_FORMAT_IGNORE_FILE: List[Path] = [
+    PROJECT_ROOT / 'garak' / 'include' / 'asio.hpp',
 ]
 
 # usefull for 3rd party bundled projects
 CLANG_FORMAT_IGNORE_DIR: List[Path] = [
-    PROJECT_ROOT / 'garak' / 'include' / 'garak' / 'bundled',
+    PROJECT_ROOT / 'garak' / 'include' / 'asio',
 ]
 
 # Files that should be ignored for clang-tidy
 CLANG_TIDY_IGNORE_FILE: List[Path] = [
     PROJECT_ROOT / 'garak' / 'tests' / 'version_test.cpp',
+    PROJECT_ROOT / 'garak' / 'include' / 'asio.hpp',
 ]
 
 # usefull for 3rd party bundled projects
 CLANG_TIDY_IGNORE_DIR: List[Path] = [
-    PROJECT_ROOT / 'garak' / 'include' / 'garak' / 'bundled',
+    PROJECT_ROOT / 'garak' / 'include' / 'asio',
 ]

@@ -30,8 +30,8 @@ COPY ../.clang-tidy /starter
 COPY ../.cmake-format.yaml /starter
 
 # Copy the python devkit tooling
-COPY ../devkit /starter/devkit
-COPY ../tooling /starter/tooling
+COPY ../devkit /libgarak/devkit
+COPY ../tooling /libgarak/tooling
 
 WORKDIR /libgarak
 

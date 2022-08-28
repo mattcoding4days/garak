@@ -32,10 +32,10 @@ Please see [this documentation](https://github.com/mattcoding4days/cmake-starter
 
 ```bash
 # Build the container (can be used to rebuild image after code changes)
-docker image build -t garak:v0.1 -f dev_containers/Build.Dockerfile .
+docker image build -t garak/build:0.1 -f dev_containers/Build.Dockerfile .
 
 # Rebuild with no cache
-docker image build --no-cache -t garak:v0.1 -f dev_containers/Build.Dockerfile.
+docker image build --no-cache -t garak/build:0.1 -f dev_containers/Build.Dockerfile.
 
 # Run the container interactively
 docker container run -it garak:v0.1
