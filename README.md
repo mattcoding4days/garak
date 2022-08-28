@@ -38,10 +38,10 @@ docker image build -t garak/build:0.1 -f dev_containers/Build.Dockerfile .
 docker image build --no-cache -t garak/build:0.1 -f dev_containers/Build.Dockerfile.
 
 # Run the container interactively
-docker container run -it garak:v0.1
+docker container run -it garak/build:0.1
 
 # Run non interactively
-docker container run garak:v0.1
+docker container run garak/build:0.1
 ```
 
 #### Running Remote-Dev.Dockerfile
