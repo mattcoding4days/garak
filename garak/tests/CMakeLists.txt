@@ -3,7 +3,7 @@ include(GoogleTest)
 #
 # NOTE: Add all test source files
 #
-set(GARAK_TEST_SOURCES "${GARAK_TEST_SOURCE_DIR}/core_version_test.cpp")
+set(GARAK_TEST_SOURCES "${GARAK_TEST_SOURCE_DIR}/version_test.cpp")
 
 #
 # NOTE: Declare a custom name for the test executable

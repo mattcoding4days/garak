@@ -14,7 +14,12 @@ add_library(
   "${GARAK_SOURCE_DIR}/version.cpp")
 
 target_include_directories(${PACKAGE_NAME} PUBLIC ${GARAK_INCLUDE_DIR})
-target_link_libraries(${PACKAGE_NAME} PRIVATE project_options project_warnings stdc++fs asio)
+target_link_libraries(
+  ${PACKAGE_NAME}
+  PRIVATE project_options
+          project_warnings
+          stdc++fs
+          asio)
 
 #
 # NOTE: Set the install targets
