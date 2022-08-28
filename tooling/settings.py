@@ -71,14 +71,21 @@ CMAKE_PROGRAMS: Dict[str, Dict[str, str]] = {
     }
 }
 
-# Files that should be ignored for formatting (clang-format, cmake-format)
-FORMAT_IGNORE: List[Path] = [
-    PROJECT_ROOT / 'app' / 'src' / 'example_file.cpp',
-    PROJECT_ROOT / 'app' / 'src' / 'some_other_file.cpp'
+# Files that should be ignored for clang-format
+CLANG_FORMAT_IGNORE_FILE: List[Path] = [
+]
+
+# usefull for 3rd party bundled projects
+CLANG_FORMAT_IGNORE_DIR: List[Path] = [
+    PROJECT_ROOT / 'garak' / 'include' / 'garak' / 'bundled',
 ]
 
 # Files that should be ignored for clang-tidy
-ANALYZE_IGNORE: List[Path] = [
-    PROJECT_ROOT / 'app' / 'tests' / 'hello_test.cpp',
-    PROJECT_ROOT / 'core' / 'tests' / 'add_test.cpp'
+CLANG_TIDY_IGNORE_FILE: List[Path] = [
+    PROJECT_ROOT / 'garak' / 'tests' / 'version_test.cpp',
+]
+
+# usefull for 3rd party bundled projects
+CLANG_TIDY_IGNORE_DIR: List[Path] = [
+    PROJECT_ROOT / 'garak' / 'include' / 'garak' / 'bundled',
 ]

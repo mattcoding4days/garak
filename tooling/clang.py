@@ -2,9 +2,10 @@
 Wrap up clang tooling functionality
 """
 
+from enum import Enum
 # standard lib
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
 
 # local package
 from tooling import settings
@@ -12,6 +13,10 @@ from tooling.utils import Log, Shell
 
 
 class Clang:
+    class IgnoreType(Enum):
+        ClangFormat = 0
+        ClangTidy = 1
+
     def __init__(self, cxx_formatter: Dict[str, str], cmake_formatter: Dict[str, str], linter: Dict[str, str]):
         self._shell = Shell()
         self._cxx_formatter: str = cxx_formatter["name"]
@@ -25,47 +30,110 @@ class Clang:
         self._source_files: List[Path] = []
         # gather all cmake files for formatting
         self._cmake_files: List[Path] = []
+        # hold all ignored files for reporting at the end
+        self._ignored_files: List[Path] = []
+
+    def _aggregate_files(self, ignore_type: IgnoreType) -> None:
+        """
+        @desc Collect all legal files based on the type of tool that is being requested
+        @param: Either clang-tidy or clang-format
+        """
         for project in settings.PROJECTS:
-            for cpp in project.rglob("**/*.cpp"):
-                self._source_files.append(cpp)
-            for hpp in project.rglob("**/*.hpp"):
-                self._source_files.append(hpp)
-            for cmake in project.rglob("**/*.txt"):
-                # BUG: Possible bug here, as regular text files
+            for file in project.rglob("**/*.cpp"):
+                if self._path_in_file_ignore(file, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                if self._path_in_directory_ignore(file, project, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                self._source_files.append(file)
+            for file in project.rglob("**/*.hpp"):
+                if self._path_in_file_ignore(file, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                if self._path_in_directory_ignore(file, project, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                self._source_files.append(file)
+            for file in project.rglob("**/*.txt"):
+                if self._path_in_file_ignore(file, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                if self._path_in_directory_ignore(file, project, ignore_type):
+                    self._ignored_files.append(file)
+                    continue
+                # BUG: Regular text files
                 # could be mistaken for CMakeLists.txt files.
                 # it shouldn't actually break anything, but rather
                 # give an unwanted outcome
-                self._cmake_files.append(cmake)
+                self._cmake_files.append(file)
+
+    def _path_in_file_ignore(self, path: Path, ignore_type: IgnoreType) -> bool:
+        """
+        @desc helper for ignoring only files
+        """
+        if ignore_type == Clang.IgnoreType.ClangFormat:
+            if path in settings.CLANG_FORMAT_IGNORE_FILE:
+                return True
+        else:
+            if path in settings.CLANG_TIDY_IGNORE_FILE:
+                return True
+
+        return False
+
+    def _path_in_directory_ignore(self, path: Path, project_root: Path, ignore_type: IgnoreType) -> bool:
+        """
+        @desc quick and dirty recursive method to test if a file is in a specified
+        ignored directory.
+        """
+        # base case, stop recursion if the path has been chopped to the current project root,
+        # we know the file isn't being igored
+        if path == project_root:
+            return False
+
+        if ignore_type == Clang.IgnoreType.ClangFormat:
+            if path in settings.CLANG_FORMAT_IGNORE_DIR:
+                return True
+        else:
+            if path in settings.CLANG_TIDY_IGNORE_DIR:
+                return True
+
+        if path in settings.CLANG_FORMAT_IGNORE_DIR or path in settings.CLANG_TIDY_IGNORE_DIR:
+            return True
+
+        return self._path_in_directory_ignore(path.parent, project_root, ignore_type)
+
+    def _show_ignored(self) -> None:
+        """
+        @desc print the number of ignored files
+        """
+        print()
+        Log.warn(f"Ignored: [{len(self._ignored_files)}] file(s)")
 
     def format(self):
         """
         @desc Run clang format on all the files found in self.files
         @raises Exception if name values are None or Empty
         """
-        # gather all the cmake files
+        self._aggregate_files(Clang.IgnoreType.ClangFormat)
         Log.info(f"Formatting all files")
         for file in self._source_files:
-            if file in settings.FORMAT_IGNORE:
-                Log.warn(f"Ignoring {file}")
-                continue
             self._shell.execute(f"{self._cxx_formatter} {self._cxx_formatter_flags} {file}")
 
         print()
         for file in self._cmake_files:
-            if file in settings.FORMAT_IGNORE:
-                Log.warn(f"Ignoring {file}")
-                continue
             self._shell.execute(f"{self._cmake_formatter} {self._cmake_formatter_flags} {file}")
+
+        self._show_ignored()
 
     def lint(self):
         """
-        @desc
+        @desc Run clang-tidy on all legal files
         """
+        self._aggregate_files(Clang.IgnoreType.ClangTidy)
         Log.info(f"Statically analyzing all files")
-        files = ""
+        files: str = ""
         for file in self._source_files:
-            if file in settings.ANALYZE_IGNORE:
-                Log.warn(f"Ignoring {file}")
-                continue
             files += f"{file} "
         self._shell.execute(f"{self._linter} {self._linter_flags} {files}")
+        self._show_ignored()
