@@ -2,7 +2,10 @@
 // Created by matt on 8/28/22.
 //
 
-#ifndef LIBGARAK_MODULE_HPP
-#define LIBGARAK_MODULE_HPP
+#ifndef LIBGARAK_CONTAINERS_MODULE_HPP
+#define LIBGARAK_CONTAINERS_MODULE_HPP
 
-#endif  // LIBGARAK_MODULE_HPP
+#include <garak/containers/thread_safe_dequeue.hpp>
+#include <garak/containers/thread_safe_map.hpp>
+
+#endif  // LIBGARAK_CONTAINERS_MODULE_HPP

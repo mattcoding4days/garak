@@ -1,6 +1,4 @@
-#include <asio.hpp>
-#include <garak/error/module.hpp>
-#include <garak/utils/module.hpp>
+#include <garak/garak.hpp>
 #include <iostream>
 
 /**
@@ -8,6 +6,6 @@
  * */
 using namespace garak;
 int main() {
-  std::cout << "library version: " << utils::get_version() << '\n';
+  std::cout << "libgarak version: " << utils::get_version() << '\n';
   return 0;
 }

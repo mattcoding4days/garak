@@ -39,8 +39,11 @@ endif()
 #
 # NOTE: Bundle all modules here
 #
-set(UTILS_MODULE "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/module.hpp"
-                 "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/version.hpp" "${GARAK_SOURCE_DIR}/utils/version.cpp")
+set(UTILS_MODULE
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/module.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/common.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/version.hpp"
+    "${GARAK_SOURCE_DIR}/utils/version.cpp")
 
 set(ERROR_MODULE
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/module.hpp"
@@ -48,6 +51,21 @@ set(ERROR_MODULE
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/source_location.hpp"
     "${GARAK_SOURCE_DIR}/error/base_error.cpp"
     "${GARAK_SOURCE_DIR}/error/source_location.cpp")
+
+set(CONTAINERS_MODULE
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/module.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_dequeue.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_map.hpp")
+
+#
+# NOTE: The master module includes all other modules defined above. This makes it easy to include sources/headers
+# into executables for examples, and tests, as well as installation targets like the library itself
+#
+set(MASTER_MODULE
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/garak.hpp"
+    ${UTILS_MODULE}
+    ${ERROR_MODULE}
+    ${CONTAINERS_MODULE})
 
 #
 # NOTE: Add the threads library
