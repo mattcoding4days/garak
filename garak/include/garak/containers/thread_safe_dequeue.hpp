@@ -47,7 +47,7 @@ class ThreadSafeDequeue {
     while (this->mInternal.empty()) {
       this->mCondVar.wait(lock);
     }
-    return mInternal.back();
+    return this->mInternal.back();
   }
 
   /**
