@@ -4,9 +4,9 @@
 #include <string>
 
 namespace garak::utils {
-#define VMAJOR 0
-#define VMINOR 1
-#define VPATCH 0
+constexpr auto VMAJOR = 0;
+constexpr auto VMINOR = 1;
+constexpr auto VPATCH = 0;
 
 /**
  * @brief return the version in string format

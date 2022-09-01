@@ -1,16 +1,11 @@
 set(PACKAGE_NAME "garak")
 
-#
-# NOTE: `get_version()` defines the variable `${${PACKAGE_NAME}_VERSION}` which is used below to set
-# the version of the library  (see `cmake/Utils.cmake`)
-#
-get_version()
 
 #
 # NOTE: Rename `${${PACKAGE_NAME}_VERSION}` variable to `${PACKAGE_VERSION}` for easy reference in the
 # current `CMakeLists.txt` file.
 #
-set(PACKAGE_VERSION ${${PACKAGE_NAME}_VERSION})
+set(PACKAGE_VERSION ${PROJECT_VERSION})
 
 #
 # NOTE: Set our source and include directory variables for use through the build

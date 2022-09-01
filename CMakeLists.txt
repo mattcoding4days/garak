@@ -10,11 +10,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #
-# NOTE: Import get_version() function from utils, and set up project name
-#
-include(cmake/Utils.cmake)
-
-#
 # NOTE: Set project name, and language.
 #
 # Sub-project versions are defined in their respective `CMakeLists.txt` files, by calling
