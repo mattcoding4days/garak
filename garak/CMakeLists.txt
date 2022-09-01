@@ -1,6 +1,5 @@
 set(PACKAGE_NAME "garak")
 
-
 #
 # NOTE: Rename `${${PACKAGE_NAME}_VERSION}` variable to `${PACKAGE_VERSION}` for easy reference in the
 # current `CMakeLists.txt` file.
