@@ -57,6 +57,14 @@ set(CONTAINERS_MODULE
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_dequeue.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_map.hpp")
 
+set(NET_MODULE
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/module.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/client.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/connection.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/error.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/packet.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/server.hpp")
+
 #
 # NOTE: The master module includes all other modules defined above. This makes it easy to include sources/headers
 # into executables for examples, and tests, as well as installation targets like the library itself
@@ -65,7 +73,8 @@ set(MASTER_MODULE
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/garak.hpp"
     ${UTILS_MODULE}
     ${ERROR_MODULE}
-    ${CONTAINERS_MODULE})
+    ${CONTAINERS_MODULE}
+    ${NET_MODULE})
 
 #
 # NOTE: Add the threads library
