@@ -53,7 +53,7 @@ struct PacketHeader {
  * */
 template <class T, class DataType>
 class Packet {
-  using DataContainer = std::vector<DataType>;
+  using PacketStream = std::vector<DataType>;
 
  public:
   /**
@@ -62,7 +62,7 @@ class Packet {
   [[nodiscard]] std::size_t size() const noexcept { return mBody.size(); }
 
   PacketHeader<T> mHeader{};
-  DataContainer mBody{};
+  PacketStream mBody{};
 };
 
 template <class T>
