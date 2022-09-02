@@ -42,8 +42,8 @@ MMO Client/Server Framework using ASIO
 #include <garak/net/client.hpp>
 #include <garak/net/connection.hpp>
 #include <garak/net/error.hpp>
-#include <garak/net/packet.hpp>
 #include <garak/net/message.hpp>
+#include <garak/net/packet.hpp>
 #include <garak/net/server.hpp>
 
 #endif  // LIBGARAK_NET_MODULE_HPP

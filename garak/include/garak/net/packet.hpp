@@ -76,8 +76,10 @@ class [[maybe_unused]] Packet {
   /**
    * @brief Override for console out compatibility/debugging
    */
-  friend std::ostream &operator<<(std::ostream &out_stream, const Packet &packet) {
-    out_stream << "ID:" << int(packet.header.id) << " Size:" << packet.header.size;
+  friend std::ostream &operator<<(std::ostream &out_stream,
+                                  const Packet &packet) {
+    out_stream << "Id:" << int(packet.header.id)
+               << " Size:" << packet.header.size;
     return out_stream;
   }
 
