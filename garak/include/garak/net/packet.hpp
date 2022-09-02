@@ -39,34 +39,129 @@ MMO Client/Server Framework using ASIO
 #ifndef LIBGARAK_NET_PACKET_HPP
 #define LIBGARAK_NET_PACKET_HPP
 
-#include <garak/utils/common.hpp>
+#include <cstring>
+#include <garak/utils/module.hpp>
 
 namespace garak::net {
 template <class T>
-struct PacketHeader {
+class PacketHeader {
+ public:
   T mId{};
-  std::uint32_t mSize{};
+  u32 mSize{};
 };
 
 /**
- * @brief Represent
+ * @brief Represent a Packet of Bytes
+ *
+ * @details this supports more low-level messaging
+ * protocols that might be used. For now libgarak will only support strings
  * */
-template <class T, class DataType>
-class Packet {
-  using PacketStream = std::vector<DataType>;
-
+template <class T>
+class [[maybe_unused]] Packet {
  public:
+  using PacketStream = std::vector<u8>;
+
+  Packet() = default;
+  virtual ~Packet() = default;
+  Packet(Packet const &) = default;
+  Packet &operator=(PacketStream const &) = default;
+  Packet(Packet &&) noexcept = default;
+  Packet &operator=(PacketStream &&) noexcept = default;
+
   /**
    * @brief Returns the size of the message body
    * */
-  [[nodiscard]] std::size_t size() const noexcept { return mBody.size(); }
+  [[nodiscard]] u64 size() const noexcept { return mBody.size(); }
+
+  /**
+   * @brief Override for console out compatibility/debugging
+   */
+  friend std::ostream &operator<<(std::ostream &out_stream, const Packet &packet) {
+    out_stream << "ID:" << int(packet.header.id) << " Size:" << packet.header.size;
+    return out_stream;
+  }
+
+  /**
+   * @brief Pushes any POD-like data into the message buffer
+   */
+  template <class DataType>
+  friend Packet &operator<<(Packet &packet, DataType const &data) {
+    // Check that the type of the data being pushed is trivially copyable
+    static_assert(std::is_standard_layout<DataType>::value,
+                  "Data is too complex to be inserted into a vector<u8>");
+
+    // Cache current size of vector, as this will be the point we insert the
+    // data
+    u64 cached_size = packet.body.size();
+
+    // Resize the vector by the size of the data being pushed
+    packet.body.resize(packet.body.size() + sizeof(DataType));
+
+    // Physically copy the data into the newly allocated vector space,
+    // TODO: Replace memcpy with iterators
+    std::memcpy(packet.body.data() + cached_size, &data, sizeof(DataType));
+
+    // Recalculate the message size
+    packet.header.size = packet.size();
+
+    // Return the target packet, so it can be "chained"
+    return packet;
+  }
+
+  /**
+   * @brief Pulls any POD-like data form the message buffer
+   * */
+  template <typename DataType>
+  friend Packet<T> &operator>>(Packet<T> &packet, DataType &data) {
+    // Check that the type of the data being pushed is trivially copyable
+    static_assert(std::is_standard_layout<DataType>::value,
+                  "Data is too complex to be extracted from a vector<u8>");
+
+    // Cache the location towards the end of the vector where the pulled data
+    // starts
+    u64 cached_size = packet.body.size() - sizeof(DataType);
+
+    // Physically copy the data from the vector into the user variable
+    // TODO: Replace memcpy with iterators
+    std::memcpy(&data, packet.body.data() + cached_size, sizeof(DataType));
+
+    // Shrink the vector to remove read bytes, and reset end position
+    packet.body.resize(cached_size);
+
+    // Recalculate the message size
+    packet.header.size = packet.size();
+
+    // Return the target packet, so it can be "chained"
+    return packet;
+  }
 
   PacketHeader<T> mHeader{};
   PacketStream mBody{};
 };
 
+template <typename T>
+class Connection;
+
+/**
+ * @brief An "owned" packet is identical to a regular packet, but it is
+ * associated with a connection. On a server, the owner would be the client that
+ * sent the message, on a client the owner would be the server.
+ * */
 template <class T>
-struct OwnedPacket {};
+class [[maybe_unused]] OwnedPacket {
+ public:
+  std::shared_ptr<Connection<T>> mRemote = nullptr;
+  Packet<T> mPacket;
+
+  /**
+   * @brief Override for console out compatibility/debugging
+   */
+  friend std::ostream &operator<<(std::ostream &out_stream,
+                                  const OwnedPacket<T> &owned_packet) {
+    out_stream << owned_packet.mPacket;
+    return out_stream;
+  }
+};
 }  // namespace garak::net
 
 #endif  // LIBGARAK_NET_PACKET_HPP

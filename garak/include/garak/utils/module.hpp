@@ -7,5 +7,6 @@
 
 #include <garak/utils/common.hpp>
 #include <garak/utils/version.hpp>
+#include <garak/utils/types.hpp>
 
 #endif  // LIBGARAK_UTILS_MODULE_HPP
