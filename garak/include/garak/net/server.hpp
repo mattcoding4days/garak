@@ -3,13 +3,6 @@
 // below is his license. Thanks Javid
 
 /*
-MMO Client/Server Framework using ASIO
-        "Happy Birthday Mrs Javidx9!" - javidx9
-        Videos:
-        Part #1: https://youtu.be/2hNdkYInj4g
-        Part #2: https://youtu.be/UbjxGvrDrbw
-        License (OLC-3)
-        ~~~~~~~~~~~~~~~
         Copyright 2018 - 2020 OneLoneCoder.com
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions
@@ -35,7 +28,8 @@ MMO Client/Server Framework using ASIO
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
         OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #ifndef LIBGARAK_NET_SERVER_HPP
 #define LIBGARAK_NET_SERVER_HPP
 
-#endif  // LIBGARAK_SERVER_HPP
+#endif  // LIBGARAK_NET_SERVER_HPP

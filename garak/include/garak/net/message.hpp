@@ -3,13 +3,6 @@
 // below is his license. Thanks Javid
 
 /*
-MMO Client/Server Framework using ASIO
-        "Happy Birthday Mrs Javidx9!" - javidx9
-        Videos:
-        Part #1: https://youtu.be/2hNdkYInj4g
-        Part #2: https://youtu.be/UbjxGvrDrbw
-        License (OLC-3)
-        ~~~~~~~~~~~~~~~
         Copyright 2018 - 2020 OneLoneCoder.com
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions
@@ -35,16 +28,26 @@ MMO Client/Server Framework using ASIO
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
         OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
 #ifndef LIBGARAK_NET_MESSAGE_HPP
 #define LIBGARAK_NET_MESSAGE_HPP
 
 #include <garak/utils/module.hpp>
 
 namespace garak::net {
+
+/**
+ * @brief Wrapper around an std::string
+ *
+ * @details Should the user need a server/client that is using jsonrpc
+ * as its protocol, a universal string based messaging system would be
+ * preferable instead of a low level byte steam.
+ * */
 class [[maybe_unused]] Message {
  public:
   std::string mBody{};
 
+ public:
   Message() = default;
   virtual ~Message() = default;
   Message(Message const &) = default;
@@ -52,6 +55,7 @@ class [[maybe_unused]] Message {
   Message(Message &&) noexcept = default;
   Message &operator=(Message &&) noexcept = default;
 
+ public:
   [[nodiscard]] std::size_t size() const noexcept { return mBody.size(); }
 
   /**
@@ -59,6 +63,7 @@ class [[maybe_unused]] Message {
    */
   void clear() noexcept { mBody.clear(); }
 
+ public:
   /**
    * @brief Override for console out compatibility/debug
    */
@@ -98,27 +103,32 @@ template <class T>
 class Connection;
 
 /**
- * @brief A standard
+ * @brief An "owned" message is identical to a regular message, but it is
+ * associated with a connection. On a server, the owner would be the client that
+ * sent the message, on a client the owner would be the server.
  * */
 template <class T>
 class [[maybe_unused]] OwnedMessage {
  public:
-  std::shared_ptr<Connection<T>> mRemote{};
-  Message mMsg{};
+  using OwnedConnection = std::shared_ptr<Connection<T>>;
 
+ public:
   OwnedMessage() = default;
-  [[maybe_unused]] OwnedMessage(std::shared_ptr<Connection<T>> &&client,
-                                Message &msg)
-      : mRemote(client), mMsg(msg) {}
+  [[maybe_unused]] OwnedMessage(OwnedConnection &&client, Message &msg)
+      : mRemote(client), mOwnedMsg(msg) {}
 
   [[maybe_unused]] explicit OwnedMessage(Message &msg)
-      : mRemote(nullptr), mMsg(msg) {}
+      : mRemote(nullptr), mOwnedMsg(msg) {}
 
   virtual ~OwnedMessage() = default;
   OwnedMessage(OwnedMessage const &) = default;
   OwnedMessage &operator=(OwnedMessage const &) = default;
   OwnedMessage(OwnedMessage &&) noexcept = default;
   OwnedMessage &operator=(OwnedMessage &&) noexcept = default;
+
+ public:
+  OwnedConnection mRemote{};
+  Message mOwnedMsg{};
 };
 }  // namespace garak::net
 #endif  // LIBGARAK_NET_MESSAGE_HPP

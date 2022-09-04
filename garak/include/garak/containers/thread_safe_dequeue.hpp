@@ -26,6 +26,7 @@ class ThreadSafeDequeue {
   ThreadSafeDequeue(ThreadSafeDequeue &&) noexcept = default;
   ThreadSafeDequeue &operator=(ThreadSafeDequeue &&) noexcept = default;
 
+ public:
   /**
    * @brief Returns a const reference to the first data element in the queue,
    * no items are removed

@@ -3,13 +3,6 @@
 // below is his license. Thanks Javid
 
 /*
-MMO Client/Server Framework using ASIO
-        "Happy Birthday Mrs Javidx9!" - javidx9
-        Videos:
-        Part #1: https://youtu.be/2hNdkYInj4g
-        Part #2: https://youtu.be/UbjxGvrDrbw
-        License (OLC-3)
-        ~~~~~~~~~~~~~~~
         Copyright 2018 - 2020 OneLoneCoder.com
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions
@@ -43,6 +36,10 @@ MMO Client/Server Framework using ASIO
 #include <garak/utils/module.hpp>
 
 namespace garak::net {
+
+/**
+ * @brief Represent the header of a byte packet
+ * */
 template <class T>
 class PacketHeader {
  public:
@@ -54,32 +51,39 @@ class PacketHeader {
  * @brief Represent a Packet of Bytes
  *
  * @details this supports more low-level messaging
- * protocols that might be used. For now libgarak will only support strings
+ * protocols that might be used. For now libgarak will only support strings,
+ * via the Message class
  * */
 template <class T>
 class [[maybe_unused]] Packet {
  public:
   using PacketStream = std::vector<u8>;
 
+ public:
+  PacketHeader<T> mHeader{};
+  PacketStream mBody{};
+
   Packet() = default;
   virtual ~Packet() = default;
   Packet(Packet const &) = default;
-  Packet &operator=(PacketStream const &) = default;
+  Packet &operator=(Packet const &) = default;
   Packet(Packet &&) noexcept = default;
-  Packet &operator=(PacketStream &&) noexcept = default;
+  Packet &operator=(Packet &&) noexcept = default;
 
+ public:
   /**
    * @brief Returns the size of the message body
    * */
   [[nodiscard]] u64 size() const noexcept { return mBody.size(); }
 
+ public:
   /**
    * @brief Override for console out compatibility/debugging
    */
   friend std::ostream &operator<<(std::ostream &out_stream,
                                   const Packet &packet) {
-    out_stream << "Id:" << int(packet.header.id)
-               << " Size:" << packet.header.size;
+    out_stream << "Id:" << int(packet.mHeader.mId)
+               << " Size:" << packet.mHeader.mSize;
     return out_stream;
   }
 
@@ -94,17 +98,17 @@ class [[maybe_unused]] Packet {
 
     // Cache current size of vector, as this will be the point we insert the
     // data
-    u64 cached_size = packet.body.size();
+    u64 cached_size = packet.mBody.size();
 
     // Resize the vector by the size of the data being pushed
-    packet.body.resize(packet.body.size() + sizeof(DataType));
+    packet.mBody.resize(packet.mBody.size() + sizeof(DataType));
 
     // Physically copy the data into the newly allocated vector space,
     // TODO: Replace memcpy with iterators
-    std::memcpy(packet.body.data() + cached_size, &data, sizeof(DataType));
+    std::memcpy(packet.mBody.data() + cached_size, &data, sizeof(DataType));
 
     // Recalculate the message size
-    packet.header.size = packet.size();
+    packet.mHeader.mSize = packet.size();
 
     // Return the target packet, so it can be "chained"
     return packet;
@@ -125,23 +129,20 @@ class [[maybe_unused]] Packet {
 
     // Physically copy the data from the vector into the user variable
     // TODO: Replace memcpy with iterators
-    std::memcpy(&data, packet.body.data() + cached_size, sizeof(DataType));
+    std::memcpy(&data, packet.mBody.data() + cached_size, sizeof(DataType));
 
     // Shrink the vector to remove read bytes, and reset end position
-    packet.body.resize(cached_size);
+    packet.mBody.resize(cached_size);
 
     // Recalculate the message size
-    packet.header.size = packet.size();
+    packet.mHeader.mSize = packet.size();
 
     // Return the target packet, so it can be "chained"
     return packet;
   }
-
-  PacketHeader<T> mHeader{};
-  PacketStream mBody{};
 };
 
-template <typename T>
+template <class T>
 class Connection;
 
 /**
@@ -152,9 +153,27 @@ class Connection;
 template <class T>
 class [[maybe_unused]] OwnedPacket {
  public:
-  std::shared_ptr<Connection<T>> mRemote = nullptr;
-  Packet<T> mPacket;
+  using OwnedConnection = std::shared_ptr<Connection<T>>;
 
+ public:
+  OwnedConnection mRemote{};
+  Packet<T> mPacket{};
+
+ public:
+  OwnedPacket() = default;
+  [[maybe_unused]] OwnedPacket(OwnedConnection &&client, Packet<T> &packet)
+      : mRemote(client), mPacket(packet) {}
+
+  [[maybe_unused]] explicit OwnedPacket(Packet<T> &packet)
+      : mRemote(nullptr), mPacket(packet) {}
+
+  virtual ~OwnedPacket() = default;
+  OwnedPacket(OwnedPacket const &) = default;
+  OwnedPacket &operator=(OwnedPacket const &) = default;
+  OwnedPacket(OwnedPacket &&) noexcept = default;
+  OwnedPacket &operator=(OwnedPacket &&) noexcept = default;
+
+ public:
   /**
    * @brief Override for console out compatibility/debugging
    */
