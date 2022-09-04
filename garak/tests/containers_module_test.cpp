@@ -10,7 +10,7 @@ using namespace garak::containers;
 constexpr auto SIZE = 32;
 
 TEST(BasicDequeue, TestThreadSafeDequeueOperations) {
-  ThreadSafeDequeue<int> queue{};
+  ThreadSafeDeque<int> queue{};
   for (std::size_t i = 0; i < SIZE; ++i) {
     queue.push_back(static_cast<int>(i));
   }
@@ -25,7 +25,7 @@ TEST(BasicDequeue, TestThreadSafeDequeueOperations) {
 }
 
 TEST(DeadLockDequeue, TestThreadSafeDequeueThreadingOperations) {
-  ThreadSafeDequeue<int> queue{};
+  ThreadSafeDeque<int> queue{};
   constexpr std::size_t mod = 100000;
   auto populate = [&]() -> void {
     for (std::size_t i = 0; i < (SIZE * mod); ++i) {

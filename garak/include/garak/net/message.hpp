@@ -56,7 +56,7 @@ class [[maybe_unused]] Message {
   Message &operator=(Message &&) noexcept = default;
 
  public:
-  [[nodiscard]] std::size_t size() const noexcept { return mBody.size(); }
+  [[nodiscard]] u64 size() const noexcept { return mBody.size(); }
 
   /**
    * @brief Clear the message buffer
@@ -113,6 +113,10 @@ class [[maybe_unused]] OwnedMessage {
   using OwnedConnection = std::shared_ptr<Connection<T>>;
 
  public:
+  OwnedConnection mRemote{};
+  Message mOwnedMsg{};
+
+ public:
   OwnedMessage() = default;
   [[maybe_unused]] OwnedMessage(OwnedConnection &&client, Message &msg)
       : mRemote(client), mOwnedMsg(msg) {}
@@ -125,10 +129,6 @@ class [[maybe_unused]] OwnedMessage {
   OwnedMessage &operator=(OwnedMessage const &) = default;
   OwnedMessage(OwnedMessage &&) noexcept = default;
   OwnedMessage &operator=(OwnedMessage &&) noexcept = default;
-
- public:
-  OwnedConnection mRemote{};
-  Message mOwnedMsg{};
 };
 }  // namespace garak::net
 #endif  // LIBGARAK_NET_MESSAGE_HPP

@@ -13,18 +13,24 @@
 #include <garak/utils/common.hpp>
 
 namespace garak::containers {
+/**
+ * @brief A thread safe wrapper around the std::deque
+ *
+ * @details Most methods are implemented in a way that is
+ * as close to the standard as possible.
+ * */
 template <class T, class Allocator = std::allocator<T>>
-class ThreadSafeDequeue {
+class ThreadSafeDeque {
   using Mutex = std::mutex;
   using ULock = std::unique_lock<Mutex>;
 
  public:
-  ThreadSafeDequeue() = default;
-  virtual ~ThreadSafeDequeue() { clear(); }
-  ThreadSafeDequeue(ThreadSafeDequeue const &) = delete;
-  ThreadSafeDequeue &operator=(ThreadSafeDequeue const &) = delete;
-  ThreadSafeDequeue(ThreadSafeDequeue &&) noexcept = default;
-  ThreadSafeDequeue &operator=(ThreadSafeDequeue &&) noexcept = default;
+  ThreadSafeDeque() = default;
+  virtual ~ThreadSafeDeque() { clear(); }
+  ThreadSafeDeque(ThreadSafeDeque const &) = delete;
+  ThreadSafeDeque &operator=(ThreadSafeDeque const &) = delete;
+  ThreadSafeDeque(ThreadSafeDeque &&) noexcept = default;
+  ThreadSafeDeque &operator=(ThreadSafeDeque &&) noexcept = default;
 
  public:
   /**
@@ -51,6 +57,38 @@ class ThreadSafeDequeue {
     return this->mInternal.back();
   }
 
+ public:
+  /**
+   * @brief Returns true if the %deque is empty. (Thus begin() would equal
+   * end().)
+   * */
+  [[nodiscard]] bool empty() noexcept {
+    ULock lock{mMutex};
+    return this->mInternal.empty();
+  }
+
+  /**
+   * @brief capacity Returns the number of elements in the %deque.
+   * */
+  [[nodiscard]] typename std::deque<T>::size_type size() const noexcept {
+    ULock lock{mMutex};
+    return this->mInternal.size();
+  }
+
+ public:
+  /**
+   * @brief Erases all the elements. Note that this function only erases the
+   * elements, and that if the elements themselves are pointers, the
+   * pointed-to memory is not touched in any way. Managing the pointer is the
+   * user's responsibility.
+   * */
+  void clear() noexcept {
+    ULock lock{mMutex};
+    if (!this->mInternal.empty()) {
+      this->mInternal.clear();
+    }
+  }
+
   /**
    * @brief Inserts a new element at the end of the container.
    * The element is constructed through std::allocator_traits::construct,
@@ -65,20 +103,6 @@ class ThreadSafeDequeue {
   }
 
   /**
-   * @brief Inserts a new element to the beginning of the container.
-   * The element is constructed through std::allocator_traits::construct,
-   * which typically uses placement-new to construct the element in-place at
-   * the location provided by the container. The arguments args... are
-   * forwarded to the constructor as
-   * */
-  template <class... Args>
-  void emplace_front(Args &&...args) {
-    addDataProtected_([&]() -> void {
-      mInternal.emplace_front(std::forward<Args>(args)...);
-    });
-  }
-
-  /**
    * @brief Adds Data to the end of the %deque
    * The element is constructed through std::allocator_traits::construct,
    * which typically uses placement-new to construct the element in-place at
@@ -87,32 +111,6 @@ class ThreadSafeDequeue {
    * */
   void push_back(T const &elem) {
     addDataProtected_([&]() -> void { mInternal.push_back(std::move(elem)); });
-  }
-
-  /**
-   * @brief Add data to the front of the %deque.
-   * @param elem Data to be added.
-   * This is a typical stack operation. The function creates an element at the
-   * front of the %deque and assigns the given data to it. Due to the nature
-   * of a %deque this operation can be done in constant time.
-   * */
-  void push_front(T const &elem) {
-    addDataProtected_([&]() -> void { mInternal.push_front(std::move(elem)); });
-  }
-
-  /**
-   * @brief Removes a single element from the front of the %deque
-   * This is a typical stack operation. It shrinks the %deque by one.
-   * NOTE, unlike to std::deque, Data is returned
-   ** */
-  [[maybe_unused]] T pop_front() noexcept {
-    ULock lock{this->mMutex};
-    while (this->mInternal.empty()) {
-      this->mCondVar.wait(lock);
-    }
-    auto elem = std::move(this->mInternal.front());
-    this->mInternal.pop_front();
-    return elem;
   }
 
   /**
@@ -131,37 +129,48 @@ class ThreadSafeDequeue {
   }
 
   /**
-   * @brief capacity Returns the number of elements in the %deque.
+   * @brief Add data to the front of the %deque.
+   * @param elem Data to be added.
+   * This is a typical stack operation. The function creates an element at the
+   * front of the %deque and assigns the given data to it. Due to the nature
+   * of a %deque this operation can be done in constant time.
    * */
-  [[nodiscard]] typename std::deque<T>::size_type size() const noexcept {
-    ULock lock{mMutex};
-    return this->mInternal.size();
+  void push_front(T const &elem) {
+    addDataProtected_([&]() -> void { mInternal.push_front(std::move(elem)); });
   }
 
   /**
-   * @brief Returns true if the %deque is empty. (Thus begin() would equal
-   * end().)
+   * @brief Inserts a new element to the beginning of the container.
+   * The element is constructed through std::allocator_traits::construct,
+   * which typically uses placement-new to construct the element in-place at
+   * the location provided by the container. The arguments args... are
+   * forwarded to the constructor as
    * */
-  [[nodiscard]] bool empty() noexcept {
-    ULock lock{mMutex};
-    return this->mInternal.empty();
+  template <class... Args>
+  void emplace_front(Args &&...args) {
+    addDataProtected_([&]() -> void {
+      mInternal.emplace_front(std::forward<Args>(args)...);
+    });
   }
 
   /**
-   * @brief Erases all the elements. Note that this function only erases the
-   * elements, and that if the elements themselves are pointers, the
-   * pointed-to memory is not touched in any way. Managing the pointer is the
-   * user's responsibility.
-   * */
-  void clear() noexcept {
-    ULock lock{mMutex};
-    if (!this->mInternal.empty()) {
-      this->mInternal.clear();
+   * @brief Removes a single element from the front of the %deque
+   * This is a typical stack operation. It shrinks the %deque by one.
+   * NOTE, unlike to std::deque, Data is returned
+   ** */
+  [[maybe_unused]] T pop_front() noexcept {
+    ULock lock{this->mMutex};
+    while (this->mInternal.empty()) {
+      this->mCondVar.wait(lock);
     }
+    auto elem = std::move(this->mInternal.front());
+    this->mInternal.pop_front();
+    return elem;
   }
 
+ public:
   /**
-   * @brief Lock the queue
+   * @brief Lock the queue, custom method
    *
    * @details: For (n) threads whom are attempting to use this container, said
    * Thread will be put "to sleep" if the container is empty. This stops
