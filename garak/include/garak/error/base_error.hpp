@@ -9,7 +9,7 @@
 
 namespace garak::error {
 /**
- * \brief Base Error that should be inherited from
+ * @brief Base Error that should be inherited from
  */
 class IGarakAbstractError : public std::exception {
  public:
@@ -23,26 +23,17 @@ class IGarakAbstractError : public std::exception {
   IGarakAbstractError &operator=(IGarakAbstractError &&) noexcept = default;
 
   [[nodiscard]] const char *what() const noexcept override;
-  [[nodiscard]] virtual auto file() const noexcept -> std::string_view;
-  [[nodiscard]] virtual auto func() const noexcept -> std::string_view;
-  [[nodiscard]] virtual auto line() const noexcept -> std::uint32_t;
-  [[nodiscard]] virtual auto formatted_info() const noexcept
-      -> std::string_view;
+  [[nodiscard]] virtual std::string_view file() const noexcept;
+  [[nodiscard]] virtual std::string_view func() const noexcept;
+  [[nodiscard]] virtual u32 line() const noexcept;
+  [[nodiscard]] virtual std::string_view formatted_info() const noexcept;
 
  protected:
   std::string mMsg{};
   std::string mFile{};
   std::string mFunc{};
-  std::uint32_t mLine{};
+  u32 mLine{};
   std::string mFormattedInfo{};
-};
-
-/**
- * \brief A basic error class
- */
-class GarakError : public IGarakAbstractError {
- public:
-  GarakError(std::string_view const &msg, SourceLocation &&slc) noexcept;
 };
 }  // namespace garak::error
 

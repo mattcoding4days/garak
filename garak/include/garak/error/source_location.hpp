@@ -6,17 +6,18 @@
 #define LIBGARAK_SOURCE_LOCATION_HPP
 
 #include <string>
+#include <garak/utils/types.hpp>
 
 namespace garak::error {
 /**
- * \brief structure that holds run time location information
+ * @brief structure that holds run time location information
  */
 struct SourceLocation {
-  SourceLocation(std::string_view const &file, std::uint32_t line,
+  SourceLocation(std::string_view const &file, u32 line,
                  std::string_view const &func) noexcept;
 
   const std::string mFile{};
-  const std::uint32_t mLine{};
+  const u32 mLine{};
   const std::string mFunc{};
 };
 

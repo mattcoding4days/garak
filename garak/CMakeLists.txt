@@ -57,6 +57,7 @@ set(NET_MODULE
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/client.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/connection.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/error.hpp"
+    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/interfaces.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/packet.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/message.hpp"
     "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/server.hpp")

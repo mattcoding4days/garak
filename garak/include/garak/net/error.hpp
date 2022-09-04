@@ -32,4 +32,20 @@
 #ifndef LIBGARAK_NET_ERROR_HPP
 #define LIBGARAK_NET_ERROR_HPP
 
+#include <garak/error/module.hpp>
+
+namespace garak::net {
+/**
+ * @brief Exception to be thrown for the TcpConnection class. Implements
+ * ICortexAbstractError.
+ */
+class ConnectionError : public error::IGarakAbstractError {
+ public:
+  ConnectionError(std::string_view const& msg,
+                  garak::error::SourceLocation slc) noexcept
+      : error::IGarakAbstractError(msg, std::move(slc)) {}
+};
+
+}  // namespace garak::net
+
 #endif  // LIBGARAK_NET_ERROR_HPP

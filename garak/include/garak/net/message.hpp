@@ -110,15 +110,15 @@ class Connection;
 template <class T>
 class [[maybe_unused]] OwnedMessage {
  public:
-  using OwnedConnection = std::shared_ptr<Connection<T>>;
+  using OwnedConnectionPtr = std::shared_ptr<Connection<T>>;
 
  public:
-  OwnedConnection mRemote{};
+  OwnedConnectionPtr mRemote{};
   Message mOwnedMsg{};
 
  public:
   OwnedMessage() = default;
-  [[maybe_unused]] OwnedMessage(OwnedConnection &&client, Message &msg)
+  [[maybe_unused]] OwnedMessage(OwnedConnectionPtr &&client, Message &msg)
       : mRemote(client), mOwnedMsg(msg) {}
 
   [[maybe_unused]] explicit OwnedMessage(Message &msg)

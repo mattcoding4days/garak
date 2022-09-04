@@ -19,23 +19,13 @@ IGarakAbstractError::IGarakAbstractError(std::string_view const &msg,
 
 const char *IGarakAbstractError::what() const noexcept { return mMsg.data(); }
 
-auto IGarakAbstractError::file() const noexcept -> std::string_view {
-  return mFile;
-}
+std::string_view IGarakAbstractError::file() const noexcept { return mFile; }
 
-auto IGarakAbstractError::func() const noexcept -> std::string_view {
-  return mFunc;
-}
+std::string_view IGarakAbstractError::func() const noexcept { return mFunc; }
 
-auto IGarakAbstractError::line() const noexcept -> std::uint32_t {
-  return mLine;
-}
+u32 IGarakAbstractError::line() const noexcept { return mLine; }
 
-auto IGarakAbstractError::formatted_info() const noexcept -> std::string_view {
+std::string_view IGarakAbstractError::formatted_info() const noexcept {
   return mFormattedInfo;
 }
-
-GarakError::GarakError(std::string_view const &msg,
-                       SourceLocation &&slc) noexcept
-    : IGarakAbstractError(msg, std::move(slc)) {}
 }  // namespace garak::error
