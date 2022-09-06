@@ -35,11 +35,83 @@
 #include <asio.hpp>
 #include <garak/containers/module.hpp>
 #include <garak/net/error.hpp>
-#include <garak/net/interfaces.hpp>
 #include <garak/net/message.hpp>
 #include <garak/utils/module.hpp>
 
 namespace garak::net {
+/**
+ * @brief A container for meta data about a connection.
+ *
+ * @details In
+ * */
+class ConnectionMetaData {
+ public:
+  /**
+   * @brief Descriptive object to use as a parameter when updating
+   * ConnectionMetaData' internal map with data
+   * */
+  struct AdditionalInfo {
+    std::string mKey{};
+    std::string mValue{};
+  };
+
+ public:
+  ConnectionMetaData() = default;
+  [[maybe_unused]] ConnectionMetaData(std::string ipaddress, u16 port);
+
+  virtual ~ConnectionMetaData() = default;
+  ConnectionMetaData(ConnectionMetaData const &) = default;
+  ConnectionMetaData &operator=(ConnectionMetaData const &) = default;
+  ConnectionMetaData(ConnectionMetaData &&) noexcept = default;
+  ConnectionMetaData &operator=(ConnectionMetaData &&) noexcept = default;
+
+ public:
+  /**
+   * @brief Getter for port
+   * */
+  [[nodiscard]] u16 getPort() const noexcept;
+
+  /**
+   * @brief Getter for ip4 address
+   * */
+  [[nodiscard]] std::string getIpAddress() const noexcept;
+
+  /**
+   * @brief Concatenates the port on the end of the ip4 address, seperated
+   * by a colon
+   * */
+  [[nodiscard]] std::string basicInfo() const noexcept;
+
+  /**
+   * @brief Get a value out of the internal map by key
+   *
+   * @param key refers to the key in the hashmap
+   *
+   * @details Exception safe, if the internal map does not contain the key,
+   * the optional value will contain std::nullopt.
+   *
+   * @returns std::optional<std::string>
+   * */
+  [[nodiscard]] std::optional<std::string> getAdditionalInfoByKey(
+      std::string const &key) const noexcept;
+
+  /**
+   * @brief Update/setter for the underlying map<std::string, std::string>,
+   * uses move semantics.
+   * */
+  [[maybe_unused]] void updateAdditionalInfo(ConnectionMetaData::AdditionalInfo &info) noexcept;
+
+  /**
+   * @brief Update/setter for the underlying map<std::string, std::string> for
+   * move semantics with inplace object construction.
+   * */
+  [[maybe_unused]] void updateAdditionalInfo(ConnectionMetaData::AdditionalInfo &&info) noexcept;
+
+ private:
+  std::string pIpaddress{};
+  u16 pPort{};
+  std::map<std::string, std::string> pAdditionalInfo{};
+};
 
 /**
  * @brief Wraps the asio::tcp::socket
@@ -47,8 +119,7 @@ namespace garak::net {
  * @details The connection is responsible for reading and writing data to the
  * socket. It is also responsible for managing the lifetime of the socket.
  * */
-template <class T>
-class Connection : public std::enable_shared_from_this<Connection<T>> {
+class Connection : public std::enable_shared_from_this<Connection> {
  public:
   /**
    * @brief Defines which implementation owns this connection
@@ -68,64 +139,50 @@ class Connection : public std::enable_shared_from_this<Connection<T>> {
    * @param asio_context is needed for the connection to be established
    * @param socket which will be used in tandem with the context
    * @param incomingQueue each connection will have a queue of incoming
-   * messages, and outgoing messages.
+   * messages
    * */
-  Connection(ConnectionMetaDataPtr metaData, Owner parent,
+  Connection(ConnectionMetaData metaData, Owner parent,
              asio::io_context &asioContext, asio::ip::tcp::socket socket,
-             containers::ThreadSafeDeque<OwnedMessage<T>> &incomingQueue)
-      : pMetaData(std::move(metaData)),
-        pOwnerType(parent),
-        pAsioContext(asioContext),
-        pSocket(std::move(socket)),
-        pQmessagesIn(incomingQueue) {}
+             containers::ThreadSafeDeque<OwnedMessage> &incomingQueue);
 
   virtual ~Connection() = default;
-  Connection(Connection const &) = default;
-  Connection &operator=(Connection const &) = default;
-  Connection(Connection &&) noexcept = default;
-  Connection &operator=(Connection &&) noexcept = default;
+
+  /**
+   * @brief Because asios socket and context objects have deleted
+   * copy constructors and move constructors, we must do the same
+   * */
+  Connection(Connection const &) = delete;
+  Connection &operator=(Connection const &) = delete;
+  Connection(Connection &&) noexcept = delete;
+  Connection &operator=(Connection &&) noexcept = delete;
 
  public:
   /**
    * @brief Get a copy to the this connections Ipv4 address
    *
-   * @details Convenience method, the user could just use getMetaData
+   * @details Convenience method for the underlying ConnectionMetaData object
    * */
-  [[nodiscard]] std::string getIp() const noexcept {
-    return pMetaData->mIpaddress;
-  }
+  [[nodiscard]] std::string getIp() const noexcept;
 
   /**
    * @brief Get a copy of the connections port
    *
-   * @details Convenience method, the user could just use getMetaData
+   * @details Convenience method for the underlying ConnectionMetaData object
    * */
-  [[nodiscard]] u8 getPort() const noexcept { return pMetaData->mPort; }
+  [[nodiscard]] u16 getPort() const noexcept;
 
   /**
-   * @brief Get a pointer of the connections MetaData
+   * @brief Get a mutable reference to the underlying ConnectionMetaData object
    *
-   * @details This will only be of a major use for server code.
-   *
-   * @return std::shared_ptr<IConnectionMetaData>
+   * @details Convenience method for the underlying ConnectionMetaData object
    * */
-  [[nodiscard]] ConnectionMetaDataPtr getMetaData() const noexcept {
-    return pMetaData;
-  }
+  [[nodiscard]] ConnectionMetaData &getConnectionMetaData() noexcept;
 
   /**
    * @brief If the owner of this connection is the server, then connect to
    * said client, and begin reading the incoming socket stream
-   */
-  [[maybe_unused]] void connectToClient() noexcept {
-    if (pOwnerType == Owner::server) {
-      if (pSocket.is_open()) {
-        pMetaData->mPort = pSocket.remote_endpoint().port();
-        pMetaData->mIpaddress = pSocket.remote_endpoint().address().to_string();
-        this->readStream_();
-      }
-    }
-  }
+   * */
+  [[maybe_unused]] void connectToClient() noexcept;
 
   /**
    * @brief Async: Connect to the server
@@ -137,59 +194,23 @@ class Connection : public std::enable_shared_from_this<Connection<T>> {
    * @throws ConnectionError if connection to the endpoint cannot be acquired
    * */
   [[maybe_unused]] void connectToServer(
-      asio::ip::tcp::resolver::results_type const &endpoint) {
-    if (pOwnerType == Owner::client) {
-      // request asio attempts to connect to an endpoint
-      asio::async_connect(
-          pSocket, endpoint,
-          [this](std::error_code error_code,
-                 asio::ip::tcp::endpoint const & /*endpoint*/) {
-            if (!error_code) {
-              pMetaData->mPort = pSocket.remote_endpoint().port();
-              pMetaData->mIpaddress =
-                  pSocket.remote_endpoint().address().to_string();
-              this->readStream_();
-            } else {
-              throw ConnectionError(error_code.message(), error::RUNTIME_INFO);
-            }
-          });
-    }
-  }
+      asio::ip::tcp::resolver::results_type const &endpoint);
 
   /**
    * @brief if the connection is active, close the socket
    * */
-  void disconnect() {
-    if (this->isConnected()) {
-      asio::post(pAsioContext, [this]() { pSocket.close(); });
-    }
-  }
+  void disconnect();
 
   /**
    * @brief Tests if the underlying socket is connected
    * */
-  [[nodiscard]] bool isConnected() const noexcept { return pSocket.is_open(); }
+  [[nodiscard]] bool isConnected() const noexcept;
 
   /**
    * @brief Async - send a message, connections are one-to-one, so no need to
    * specify the target, for a client, the target is the server and vice versa
    **/
-  void send(Message const &msg) {
-    // Post asynchronously
-    asio::post(pAsioContext, [this, msg]() {
-      // The asio context may already be busy writing messages,
-      // we will know if it is in the middle of such a task if the
-      // out going message deque is not empty.
-      bool currently_writing_messages = !pQmessagesOut.empty();
-      // load our new message in
-      pQmessagesOut.push_back(msg);
-      if (!currently_writing_messages) {
-        // wait until the deque of outgoing messages is empty to
-        // start writing more
-        this->writeStream_();
-      }
-    });
-  }
+  void send(Message const &msg);
 
  private:
   /**
@@ -197,100 +218,24 @@ class Connection : public std::enable_shared_from_this<Connection<T>> {
    *
    * @details Prime the context, ready to write a message body,
    * */
-  void writeStream_() {
-    //  Socket is not necessarily open here. Potentially causes 'Bad
-    // descriptor' error.
-    if (!pSocket.is_open()) {
-      // TODO: Replace this with a light weight sys logger
-      std::cerr << "Socket is closed, failed to write" << '\n';
-      return;
-    }
-    asio::async_write(
-        pSocket,
-        asio::buffer(pQmessagesOut.front().mBody.data(),
-                     pQmessagesOut.front().mBody.size()),
-        [this](std::error_code error_code, u64 /*bytes_transferred*/) {
-          if (!error_code || (error_code == asio::error::eof)) {
-            // sending was successful, remove it from the deque
-            pQmessagesOut.pop_front();
-
-            // if the deque still has messages in it, call
-            // write_header(), to start reading the next message
-            if (!pQmessagesOut.empty()) {
-              this->writeStream_();
-            }
-          } else {
-            // sending the body failed, this could be an error, or perhaps
-            // the other end of the connection disconnected. This is common
-            // in tcp servers, the client will disconnect and the server does
-            // not know about it until it tries to send something to the client.
-            // TODO: Replace this with a light weight sys logger
-            std::cerr << "\nError: " << error_code.message() << ":"
-                      << error_code.value() << '\n';
-            pSocket.close();
-          }
-        });
-  }
+  void writeStream_();
 
   /**
    * @brief Async: Prime the context ready to read a message body
    * */
-  void readStream_() {
-    asio::async_read(
-        pSocket, pReadBuffer, asio::transfer_at_least(1),
-        [this](std::error_code error_code, u64 /*bytes_transferred*/) {
-          if (!error_code) {
-            // TODO: refactor for Packet and Message
-            std::istream input(&pReadBuffer);
-            std::string line{};
-            std::string body{};
-            while (std::getline(input, line)) {
-              body.append(line);
-            }
-            pTempMsg << body;
-            this->addToIncomingMessageQueue_();
-          } else if (error_code == asio::error::eof) {
-            // End of File
-            std::cout << "Connection closed cleanly by peer" << '\n';
-            this->disconnect();
-          } else {
-            // Error: reading the body failed
-            // TODO: Replace this with a light weight sys logger
-            std::cerr << "[" << pMetaData->mIpaddress << "]: "
-                      << "Error: " << error_code.message() << ":"
-                      << error_code.value() << 'n';
-            pSocket.close();
-          }
-        });
-  }
+  void readStream_();
 
   /**
    * @brief If the owner of this connection is a server, we need to create an
    *  owned message,
    * */
-  void addToIncomingMessageQueue_() {
-    if (pOwnerType == Owner::server) {
-      // NOTE: OwnedMessage requires a shared pointer, and a Message object,
-      // since the Connection class inherits from shared_from_this, we can
-      // pass in a shared pointer to this entire object, safer and more robust
-      // than simply passing in *this.
-      pQmessagesIn.push_back({this->shared_from_this(), pTempMsg});
-    } else {
-      // NOTE: if the connection belongs to a client, it makes no sense to take
-      // the connection with a shared_ptr, as clients only have one connection
-      pQmessagesIn.push_back({pTempMsg});
-    }
-    // NOTE: since this method is always called once we are finished reading
-    // a message, we can use this opportunity to register another async task
-    // for the asio context to perform
-    readStream_();
-  }
+  void addToIncomingMessageQueue_();
 
  private:
   /**
    * @brief Metadata for this connection
    * */
-  ConnectionMetaDataPtr pMetaData{};
+  ConnectionMetaData pMetaData{};
 
   /**
    * @brief Default owner is server
@@ -322,7 +267,7 @@ class Connection : public std::enable_shared_from_this<Connection<T>> {
    * great care must be taken here so that the queue does not become a dead
    * reference
    * */
-  containers::ThreadSafeDeque<OwnedMessage<T>> &pQmessagesIn{};
+  containers::ThreadSafeDeque<OwnedMessage> &pQmessagesIn;
 
   /**
    * @brief This deque holds all messages to be sent to the remote side

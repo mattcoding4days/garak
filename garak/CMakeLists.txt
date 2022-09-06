@@ -23,55 +23,58 @@ option(GARAK_BUILD_EXAMPLES "Enable example builds" ON)
 #
 # NOTE: Prevent in source builds (can't build in src/ or in project root)
 #
-if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR OR CMAKE_CURRENT_BINARY_DIR STREQUAL GARAK_SOURCE_DIR)
-  message(
-    FATAL_ERROR
-      "In source builds are not allowed. Please make a new directory (called a build directory) and run CMake from there."
-  )
-endif()
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR OR CMAKE_CURRENT_BINARY_DIR STREQUAL GARAK_SOURCE_DIR)
+    message(
+            FATAL_ERROR
+            "In source builds are not allowed. Please make a new directory (called a build directory) and run CMake from there."
+    )
+endif ()
 
 #
 # NOTE: Bundle all modules here
 #
 set(UTILS_MODULE
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/module.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/common.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/version.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/types.hpp"
-    "${GARAK_SOURCE_DIR}/utils/version.cpp")
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/module.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/common.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/version.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/utils/types.hpp"
+        "${GARAK_SOURCE_DIR}/utils/version.cpp")
 
 set(ERROR_MODULE
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/module.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/base_error.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/source_location.hpp"
-    "${GARAK_SOURCE_DIR}/error/base_error.cpp"
-    "${GARAK_SOURCE_DIR}/error/source_location.cpp")
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/module.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/base_error.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/error/source_location.hpp"
+        "${GARAK_SOURCE_DIR}/error/base_error.cpp"
+        "${GARAK_SOURCE_DIR}/error/source_location.cpp")
 
 set(CONTAINERS_MODULE
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/module.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_dequeue.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_map.hpp")
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/module.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_dequeue.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/containers/thread_safe_map.hpp")
 
 set(NET_MODULE
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/module.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/client.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/connection.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/error.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/interfaces.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/packet.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/message.hpp"
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/server.hpp")
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/module.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/client.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/connection.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/error.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/message.hpp"
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/net/server.hpp"
+        "${GARAK_SOURCE_DIR}/net/client.cpp"
+        "${GARAK_SOURCE_DIR}/net/connection.cpp"
+        "${GARAK_SOURCE_DIR}/net/error.cpp"
+        "${GARAK_SOURCE_DIR}/net/message.cpp"
+        "${GARAK_SOURCE_DIR}/net/server.cpp")
 
 #
 # NOTE: The master module includes all other modules defined above. This makes it easy to include sources/headers
 # into executables for examples, and tests, as well as installation targets like the library itself
 #
 set(MASTER_MODULE
-    "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/garak.hpp"
-    ${UTILS_MODULE}
-    ${ERROR_MODULE}
-    ${CONTAINERS_MODULE}
-    ${NET_MODULE})
+        "${GARAK_INCLUDE_DIR}/${PACKAGE_NAME}/garak.hpp"
+        ${UTILS_MODULE}
+        ${ERROR_MODULE}
+        ${CONTAINERS_MODULE}
+        ${NET_MODULE})
 
 #
 # NOTE: Add the threads library
@@ -87,36 +90,36 @@ find_package(Threads REQUIRED)
 #
 # NOTE: Using `CPMFindPackage()` to install package only if it is not already installed.
 #
-if(GARAK_BUILD_TESTING)
-  cpmaddpackage(
-    NAME
-    googletest
-    GITHUB_REPOSITORY
-    google/googletest
-    GIT_TAG
-    release-1.11.0
-    VERSION
-    1.11.0
-    OPTIONS
-    "BUILD_GMOCK ON"
-    "INSTALL_GTEST OFF"
-    "gtest_force_shared_crt ON")
-  if(googletest_ADDED)
-    message(STATUS "gtest configured correctly")
-    set(googletest_Installed
-        ON
-        PARENT_SCOPE)
-  elseif(googletest_Installed)
-    message(STATUS "gtest already installed")
-  else()
-    message(WARNING "gtest was not configured properly")
-  endif()
+if (GARAK_BUILD_TESTING)
+    cpmaddpackage(
+            NAME
+            googletest
+            GITHUB_REPOSITORY
+            google/googletest
+            GIT_TAG
+            release-1.11.0
+            VERSION
+            1.11.0
+            OPTIONS
+            "BUILD_GMOCK ON"
+            "INSTALL_GTEST OFF"
+            "gtest_force_shared_crt ON")
+    if (googletest_ADDED)
+        message(STATUS "gtest configured correctly")
+        set(googletest_Installed
+                ON
+                PARENT_SCOPE)
+    elseif (googletest_Installed)
+        message(STATUS "gtest already installed")
+    else ()
+        message(WARNING "gtest was not configured properly")
+    endif ()
 
-  # add tests
-  enable_testing()
-  message(STATUS "${PACKAGE_NAME} -- Tests Enabled")
-  add_subdirectory("tests")
-endif()
+    # add tests
+    enable_testing()
+    message(STATUS "${PACKAGE_NAME} -- Tests Enabled")
+    add_subdirectory("tests")
+endif ()
 
 #
 # NOTE: Add the bundled boost asio version 1.24.0 stand alone as an interface library
@@ -136,7 +139,7 @@ add_subdirectory("src")
 #
 # NOTE: Build project examples
 #
-if(GARAK_BUILD_EXAMPLES)
-  message(STATUS "${PACKAGE_NAME} -- Examples Enabled")
-  add_subdirectory("examples")
-endif()
+if (GARAK_BUILD_EXAMPLES)
+    message(STATUS "${PACKAGE_NAME} -- Examples Enabled")
+    add_subdirectory("examples")
+endif ()

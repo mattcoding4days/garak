@@ -35,15 +35,15 @@
 #include <garak/utils/module.hpp>
 
 namespace garak::net {
-
 /**
  * @brief Wrapper around an std::string
  *
  * @details Should the user need a server/client that is using jsonrpc
  * as its protocol, a universal string based messaging system would be
- * preferable instead of a low level byte steam.
+ * preferable instead of low level byte streams.
  * */
-class [[maybe_unused]] Message {
+
+class Message {
  public:
   std::string mBody{};
 
@@ -56,50 +56,32 @@ class [[maybe_unused]] Message {
   Message &operator=(Message &&) noexcept = default;
 
  public:
-  [[nodiscard]] u64 size() const noexcept { return mBody.size(); }
+  [[nodiscard]] u64 size() const noexcept;
 
   /**
    * @brief Clear the message buffer
    */
-  void clear() noexcept { mBody.clear(); }
+  void clear() noexcept;
 
  public:
   /**
    * @brief Override for console out compatibility/debug
    */
-  friend std::ostream &operator<<(std::ostream &out_stream,
-                                  Message const &msg) {
-    out_stream << "Message: " << msg.mBody << "\nSize: " << msg.size();
-    return out_stream;
-  }
+  friend std::ostream &operator<<(std::ostream &out_stream, Message const &msg);
 
   /**
    * @brief Push data into the buffer, specialization overload for the
    * string type
    */
-  friend Message &operator<<(Message &msg, std::string &data) {
-    // sanitize
-    u64 pos = data.find("\r\n\r\n");
-    if (pos != std::string::npos) {
-      data = data.substr(pos + 4);
-    }
-    msg.mBody = data.append("\n");
-    return msg;
-  }
+  friend Message &operator<<(Message &msg, std::string &data);
 
   /**
    * @brief Remove data from the buffer, specialization overload for the
    * string type
    */
-  friend Message &operator>>(Message &msg, std::string &data) {
-    data = msg.mBody;
-    std::size_t cache = (msg.size() - data.size());
-    msg.mBody.resize(cache);
-    return msg;
-  }
+  friend Message &operator>>(Message &msg, std::string &data);
 };
 
-template <class T>
 class Connection;
 
 /**
@@ -107,10 +89,9 @@ class Connection;
  * associated with a connection. On a server, the owner would be the client that
  * sent the message, on a client the owner would be the server.
  * */
-template <class T>
-class [[maybe_unused]] OwnedMessage {
+class OwnedMessage {
  public:
-  using OwnedConnectionPtr = std::shared_ptr<Connection<T>>;
+  using OwnedConnectionPtr = std::shared_ptr<Connection>;
 
  public:
   OwnedConnectionPtr mRemote{};
@@ -118,12 +99,8 @@ class [[maybe_unused]] OwnedMessage {
 
  public:
   OwnedMessage() = default;
-  [[maybe_unused]] OwnedMessage(OwnedConnectionPtr &&client, Message &msg)
-      : mRemote(client), mOwnedMsg(msg) {}
-
-  [[maybe_unused]] explicit OwnedMessage(Message &msg)
-      : mRemote(nullptr), mOwnedMsg(msg) {}
-
+  OwnedMessage(OwnedConnectionPtr &&client, Message &msg);
+  explicit OwnedMessage(Message &msg);
   virtual ~OwnedMessage() = default;
   OwnedMessage(OwnedMessage const &) = default;
   OwnedMessage &operator=(OwnedMessage const &) = default;

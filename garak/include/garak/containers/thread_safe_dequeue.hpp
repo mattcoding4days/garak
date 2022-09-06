@@ -58,6 +58,10 @@ class ThreadSafeDeque {
   }
 
  public:
+  void erase() {
+  }
+
+ public:
   /**
    * @brief Returns true if the %deque is empty. (Thus begin() would equal
    * end().)
@@ -130,6 +134,7 @@ class ThreadSafeDeque {
 
   /**
    * @brief Add data to the front of the %deque.
+   *
    * @param elem Data to be added.
    * This is a typical stack operation. The function creates an element at the
    * front of the %deque and assigns the given data to it. Due to the nature
